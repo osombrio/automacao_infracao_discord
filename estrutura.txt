@@ -1,0 +1,34 @@
+Listagem de caminhos de pasta para o volume OS
+O número de série do volume é A4C9-ECC3
+C:.
+¦   estrutura.txt
+¦   main.py
+¦   README.md
+¦   
++---.idea
+¦   ¦   .gitignore
+¦   ¦   123456789.iml
+¦   ¦   misc.xml
+¦   ¦   modules.xml
+¦   ¦   workspace.xml
+¦   ¦   
+¦   +---codeStyles
+¦           codeStyleConfig.xml
+¦           Project.xml
+¦           
++---data
+¦       infracoes.xlsx
+¦       
++---models
+¦   ¦   avalia_infracao.py
+¦   ¦   contexto.py
+¦   ¦   regra.py
+¦   ¦   
+¦   +---__pycache__
+¦           contexto.cpython-312.pyc
+¦           validadores.cpython-312.pyc
+¦           
++---utils
+        colunas_preset.py
+        leitor_excel.py
+        
