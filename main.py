@@ -1,7 +1,8 @@
-
+from models.formatar_resultado import formatar_resultado
 from models.avalia_infracao import avaliar_infracoes
 from models.contexto import validar_contexto
 from models.criar_dados import criar_regra_do_usuario
+from utils.interpreta_comando import interpretar_comando_punir
 from utils.leitor_excel import carregar_regras
 import sys
 import os
@@ -25,8 +26,8 @@ def testar_com_varios_contextos(arq_regras, contextos):
             continue
 
         infracao = criar_regra_do_usuario(contexto_validado)
-
-        resultado = avaliar_infracoes(regras, infracao)
+        regras_aplicaveis = avaliar_infracoes(regras, infracao)
+        resultado = formatar_resultado(regras_aplicaveis, infracao)
         print("Contexto:", contexto)
         print("Resultado da avaliação:")
         print(resultado)
@@ -35,7 +36,11 @@ def main():
     print("Gerenciador de Punições - Testes múltiplos (v1.0)")
 
     arq = "data/infracoes.xlsx"
-    contextos = []
+
+    contextos = list()
+    contextos.append(interpretar_comando_punir(
+        "/punir cod:11 prova:True intencao:True privado:False reincidencia:False"))
+    '''
     contextos.append(
         {
             "cod": "12",
@@ -46,7 +51,6 @@ def main():
             "reincidencia": False
         }
     )
-    '''
     contextos = [
         {
             "cod": "1,2",

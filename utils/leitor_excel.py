@@ -7,13 +7,13 @@ from utils.normalizador import normalizar_nome  # se estiver separada a função
 import openpyxl
 
 import unicodedata
-
+'''
 def normalizar_nome(nome: str) -> str:
     nome = unicodedata.normalize("NFKD", nome)
     nome = nome.encode("ASCII", "ignore").decode("utf-8")
     nome = nome.strip().lower().replace(" ", "_")
     return nome
-
+'''
 
 def carregar_regras(path_planilha: str) -> list[Regra]:
     wb = openpyxl.load_workbook(path_planilha, data_only=True)

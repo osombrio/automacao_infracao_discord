@@ -12,9 +12,10 @@ class Grade:
         self.colunas = colunas
 
 class Bloco:
-    def __init__(self, valor, nome_campo):
+    def __init__(self, valor, nome_campo, identificador):
         self.valor = valor
         self.nome_campo = nome_campo
+        self.identificador = identificador
 
 class Linha:
     def __init__(self, **kwargs):
@@ -28,7 +29,8 @@ class _TabelaPlanilha:
         def get_bloco(attr: str) -> Bloco:
             coluna_template = getattr(TEMPLATE, attr)
             idx = colunas[normalizar_nome(coluna_template.ID)]
-            return Bloco(row[idx], attr)
+            identificador = colunas[normalizar_nome(TEMPLATE.identificador.ID)]
+            return Bloco(row[idx], attr, row[identificador])
 
         dados_linha = {
             attr: get_bloco(attr)

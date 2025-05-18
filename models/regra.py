@@ -6,6 +6,7 @@ from utils.template import TEMPLATE
 
 @dataclass
 class Regra:
+    identificador: Optional[int] = None
     categoria: Optional[str] = None
     cod: Optional[str] = None
     desc: Optional[str] = None
@@ -19,23 +20,40 @@ class Regra:
     exclusao: Optional[str] = None
     relacionadas: Optional[str] = None
     privado: Optional[bool] = None
-    identificador: Optional[int] = None
+
 
     def gerar_template(self):
         cod = self.cod or "Sem código"
         desc = self.desc or "Sem descrição"
-        return f"<Regra {cod} | Descrição: {desc}>"
+        return f"< ID {self.identificador} | Regra {cod} | Desc: {desc}>"
+
+    @staticmethod
+    def obter_valor(origem, chave: str, default=None):
+        if isinstance(origem, dict):
+            return origem.get(chave, default)
+        return getattr(origem, chave, default)
+
+    @staticmethod
+    def obter_todos(obj, prefixo):
+        if isinstance(obj, dict):
+            return {k: v for k, v in obj.items() if k.startswith(prefixo)}
+        return {
+            attr: getattr(obj, attr)
+            for attr in dir(obj)
+            if attr.startswith(prefixo) and not attr.startswith("__")
+        }
 
     def se_aplica(self, contexto) -> bool:
         # Função auxiliar para pegar atributo de dict ou objeto
+        '''
         def obter_valor(obj, chave, default=None):
             if isinstance(obj, dict):
                 return obj.get(chave, default)
             return getattr(obj, chave, default)
-    
+        '''
         print(f"\nAvaliar regra: {self}")
     
-        codigos_contexto = obter_valor(contexto, TEMPLATE.cod.nome, "")
+        codigos_contexto = self.obter_valor(contexto, TEMPLATE.cod.nome, "")
         print(f"Códigos no contexto: {codigos_contexto}")
     
         if isinstance(codigos_contexto, str):
@@ -57,30 +75,47 @@ class Regra:
             return False
     
         # Pega a descrição (sem filtro condicao/exclusao)
-        desc = (obter_valor(contexto, TEMPLATE.desc.nome, "") or "").lower()
+        desc = (self.obter_valor(contexto, TEMPLATE.desc.nome, "") or "").lower()
         print(f"Descrição no contexto: '{desc}'")
     
-        if self.prova and not obter_valor(contexto, TEMPLATE.prova.nome, False):
+        if self.prova and not self.obter_valor(contexto, TEMPLATE.prova.nome, False):
             print("-> Prova detalhada exigida, mas contexto não tem prova. Regra não se aplica.")
             return False
     
-        if not self.intencao and not obter_valor(contexto, TEMPLATE.intencao.nome, False):
+        if not self.intencao and not self.obter_valor(contexto, TEMPLATE.intencao.nome, False):
             print("-> Regra permite punir sem intenção, mas contexto indica ausência de intenção. Regra não se aplica.")
             return False
     
-        if not self.privado and obter_valor(contexto, TEMPLATE.privado.nome, False):
+        if not self.privado and self.obter_valor(contexto, TEMPLATE.privado.nome, False):
             print("-> Regra não permite contexto privado, mas contexto é privado. Regra não se aplica.")
             return False
     
         print("-> Regra se aplica!")
         return True
-
+    '''
     def retornar_pontuacao(self, contexto: dict):
         return getattr(contexto, TEMPLATE.reincidencia.nome, None) if self.prazo else getattr(contexto, TEMPLATE.punicao.nome, None)
+    '''
+    '''
+    def retornar_pontuacao(self, contexto: dict):
+        valor = self.obter_valor(
+            contexto,
+            TEMPLATE.reincidencia.nome if self.prazo else TEMPLATE.punicao.nome,
+            0
+        )
+        try:
+            return int(valor)
+        except (TypeError, ValueError):
+            return 0
+    '''
+    def retornar_pontuacao(self, contexto):
+        print(f"[DEBUG - retornar_pontuacao] Regra {self.identificador}: punicao = {self.punicao}")
+        return self.punicao
 
-    
+
+'''
     def __str__(self):
         cod = self.cod if self.cod else "Sem código"
         desc = self.desc if self.desc else "Sem descrição"
-        return f"<Regra {cod} | Descrição: {desc}>"
-    
+        return f"< Identificador {self.identificador} | Regra {cod} | Descrição: {desc}>"
+    '''

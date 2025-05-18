@@ -3,7 +3,7 @@ import pytest
 from utils.leitor_excel import carregar_regras
 from models.regra import Regra
 import os
-path = os.path.join(os.path.dirname(__file__), "data/infracoes_teste.xlsx")
+path = os.path.join(os.path.dirname(__file__), "data/infracoes.xlsx")
 
 def test_carregar_regras_com_arquivo_valido():
     # path = "data/infracoes_teste.xlsx"  # Use uma planilha de teste pequena e controlada
