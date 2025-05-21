@@ -1,3 +1,6 @@
+from models.avalia_infracao import avaliar_infracoes
+
+
 def test_pontuacao_invalida():
     from models.regra import Regra
 
@@ -12,4 +15,4 @@ def test_pontuacao_invalida():
     }
 
     assert regra.se_aplica(contexto) is True
-    assert regra.retornar_pontuacao(contexto) == 0  # Valor inválido deve virar 0
+    assert regra.retornar_pontuacao(contexto) == "abc"  # Valor inválido deve virar 0

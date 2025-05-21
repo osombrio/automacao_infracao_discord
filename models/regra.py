@@ -25,13 +25,57 @@ class Regra:
     def gerar_template(self):
         cod = self.cod or "Sem código"
         desc = self.desc or "Sem descrição"
-        return f"< ID {self.identificador} | Regra {cod} | Desc: {desc}>"
+        # return f"< ID {self.identificador} | Regra {cod} | Desc: {desc}>"
+        return self.__str__()
 
     @staticmethod
     def obter_valor(origem, chave: str, default=None):
         if isinstance(origem, dict):
             return origem.get(chave, default)
         return getattr(origem, chave, default)
+
+    @staticmethod
+    def filtrar_regras_qualquer(regras: list, **filtros):
+        resultado = []
+        for regra in regras:
+            correspondencias = []
+            for campo, valor in filtros.items():
+                campo_valor = Regra.obter_valor(regra, campo)
+                if campo_valor is None:
+                    continue
+                if isinstance(campo_valor, str):
+                    if str(valor).lower() in campo_valor.lower():
+                        correspondencias.append(f"{campo}='{campo_valor}'")
+                elif campo_valor == valor:
+                    correspondencias.append(f"{campo}={campo_valor}")
+            if correspondencias:
+                # print(f"[DEBUG - filtro qualquer] Regra {regra.identificador} bateu com: {', '.join(correspondencias)}")
+                resultado.append(regra)
+        return resultado
+
+
+
+    @staticmethod
+    def filtrar_regras(regras: list, **filtros):
+        resultado = []
+        for regra in regras:
+            match = True
+            for campo, valor in filtros.items():
+                campo_valor = Regra.obter_valor(regra, campo)
+                if campo_valor is None:
+                    match = False
+                    break
+                if isinstance(campo_valor, str):
+                    if str(valor).lower() not in campo_valor.lower():
+                        match = False
+                        break
+                elif campo_valor != valor:
+                    match = False
+                    break
+            if match:
+                # print(f"[DEBUG - filtro] Regra {regra.identificador} corresponde ao filtro: {filtros}")
+                resultado.append(regra)
+        return resultado
 
     @staticmethod
     def obter_todos(obj, prefixo):
@@ -51,10 +95,10 @@ class Regra:
                 return obj.get(chave, default)
             return getattr(obj, chave, default)
         '''
-        print(f"\nAvaliar regra: {self}")
+        # print(f"\nAvaliar regra: {self}")
     
         codigos_contexto = self.obter_valor(contexto, TEMPLATE.cod.nome, "")
-        print(f"Códigos no contexto: {codigos_contexto}")
+        # print(f"Códigos no contexto: {codigos_contexto}")
     
         if isinstance(codigos_contexto, str):
             codigos_contexto = [c.strip() for c in codigos_contexto.split(",")]
@@ -62,7 +106,7 @@ class Regra:
             codigos_contexto = [str(codigos_contexto)]
 
         cod = self.cod
-        print(f"Códigos da regra: {cod}")
+        # print(f"Códigos da regra: {cod}")
     
         if isinstance(cod, str):
             cod = [c.strip() for c in cod.split(",")]
@@ -71,12 +115,12 @@ class Regra:
     
         # Verifica se algum código da regra está no contexto
         if not any(c in codigos_contexto for c in cod):
-            print("-> Código da regra não corresponde ao contexto. Regra não se aplica.")
+            # print("-> Código da regra não corresponde ao contexto. Regra não se aplica.")
             return False
     
         # Pega a descrição (sem filtro condicao/exclusao)
         desc = (self.obter_valor(contexto, TEMPLATE.desc.nome, "") or "").lower()
-        print(f"Descrição no contexto: '{desc}'")
+        # print(f"Descrição no contexto: '{desc}'")
     
         if self.prova and not self.obter_valor(contexto, TEMPLATE.prova.nome, False):
             print("-> Prova detalhada exigida, mas contexto não tem prova. Regra não se aplica.")
@@ -92,24 +136,9 @@ class Regra:
     
         print("-> Regra se aplica!")
         return True
-    '''
-    def retornar_pontuacao(self, contexto: dict):
-        return getattr(contexto, TEMPLATE.reincidencia.nome, None) if self.prazo else getattr(contexto, TEMPLATE.punicao.nome, None)
-    '''
-    '''
-    def retornar_pontuacao(self, contexto: dict):
-        valor = self.obter_valor(
-            contexto,
-            TEMPLATE.reincidencia.nome if self.prazo else TEMPLATE.punicao.nome,
-            0
-        )
-        try:
-            return int(valor)
-        except (TypeError, ValueError):
-            return 0
-    '''
-    def retornar_pontuacao(self, contexto):
-        print(f"[DEBUG - retornar_pontuacao] Regra {self.identificador}: punicao = {self.punicao}")
+
+    def retornar_pontuacao(self):
+        # print(f"[DEBUG - retornar_pontuacao] Regra {self.identificador}: punicao = {self.punicao}")
         return self.punicao
 
 
@@ -119,3 +148,20 @@ class Regra:
         desc = self.desc if self.desc else "Sem descrição"
         return f"< Identificador {self.identificador} | Regra {cod} | Descrição: {desc}>"
     '''
+
+'''
+def retornar_pontuacao(self, contexto: dict):
+    return getattr(contexto, TEMPLATE.reincidencia.nome, None) if self.prazo else getattr(contexto, TEMPLATE.punicao.nome, None)
+'''
+'''
+def retornar_pontuacao(self, contexto: dict):
+    valor = self.obter_valor(
+        contexto,
+        TEMPLATE.reincidencia.nome if self.prazo else TEMPLATE.punicao.nome,
+        0
+    )
+    try:
+        return int(valor)
+    except (TypeError, ValueError):
+        return 0
+'''

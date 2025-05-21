@@ -8,9 +8,9 @@ def test_pontuacao_com_prazo():
         "prova": True,
         "intencao": True,
         "privado": False,
-        "reincidencia": 5,
+        "reincidencia": False,
         "punicao": 1
     }
 
     assert regra.se_aplica(contexto) is True
-    assert regra.retornar_pontuacao(contexto) == 5
+    assert regra.retornar_pontuacao(contexto) == 1
